@@ -1,0 +1,14 @@
+{
+  "name": "roseemerged",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "demo": "node server.mjs --demo",
+    "test": "node --test test/*.test.mjs",
+    "build": "node build.mjs"
+  }
+}

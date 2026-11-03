@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#181b17">
+<title>Garden studio · RoseEmerged</title><link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+<header><a class="wordmark" href="/">RoseEmerged</a><nav aria-label="Studio navigation"><a href="/">Visit garden ↗</a><button id="signout" type="button" hidden>Sign out</button></nav></header>
+<main>
+<section id="signin" hidden><div class="eyebrow">Akai &amp; Hoor · Private studio</div><h1>Garden studio</h1><p>Sign in to tend your projects.</p>
+<form id="login"><label>Email<input type="email" name="account" autocomplete="username" required autocapitalize="none"></label>
+<label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+<button class="primary">Sign in</button></form></section>
+<section id="studio" hidden>
+<div class="eyebrow">Akai &amp; Hoor · Private studio</div><h1>Garden studio</h1>
+<div class="studio-grid">
+<section class="inventory panel"><div class="section-top"><h2>Projects</h2><button class="primary compact" id="new">+ New</button></div>
+<p class="hint">Published roses appear in this order, three to a plot.</p><ol id="projects"></ol></section>
+<section class="panel editor"><div class="eyebrow">Project record</div><h2 id="editor-title">New project</h2>
+<form id="edit">
+<div class="pair"><label>Title<input name="title" maxlength="160" required></label><label>Project type<input name="type" maxlength="100" required></label></div>
+<label>Short description<textarea name="description" maxlength="2000" rows="3"></textarea></label>
+<label>Public project URL <small>Optional</small><input type="url" name="url" placeholder="https://" pattern="https?://.+" autocapitalize="none"></label>
+<label>Thumbnail URL <small>Optional</small><input name="thumbnail" placeholder="https://…" autocapitalize="none"></label>
+<div class="preview"><div id="rose"></div><div class="growth">
+<label for="range">Rose completion</label><div class="number"><input id="percent" type="number" min="0" max="100" step="1" required aria-label="Completion percentage"><span>%</span></div>
+<input id="range" type="range" min="0" max="100" step="1" aria-label="Adjust rose completion"><small>Live garden preview</small>
+</div></div>
+<label class="publish"><input type="checkbox" name="published"><span>Publish in the garden<small>Unpublished projects stay private.</small></span></label>
+<div class="actions"><button class="primary">Save project</button><button type="button" id="delete" hidden>Delete project</button></div>
+</form></section></div></section>
+<p id="feedback" role="status" aria-live="polite">Opening studio…</p>
+</main>
+<dialog id="confirmation"><form method="dialog"><h2>Delete project?</h2><p id="delete-info"></p><div class="actions"><button value="cancel" autofocus>Cancel</button><button class="danger" value="delete">Delete project</button></div></form></dialog>
+<script type="module" src="/admin.js"></script></body></html>

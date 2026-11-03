@@ -17,7 +17,7 @@ const worker=(await readFile('worker.mjs','utf8')).replace("import { handle } fr
 await writeFile('dist/server/index.js',core+'\n'+worker+'\nconst assets='+JSON.stringify(assets)+';\n'+`
 export default {async fetch(request,env){
   const path=new URL(request.url).pathname;
-  if(path.startsWith('/api/')) return hostedApi(request,env);
+  if(path.startsWith('/api/') || path.startsWith('/media/')) return hostedApi(request,env);
   if(request.method!=='GET' && request.method!=='HEAD') return new Response(null,{status:405});
   const route=({'/':'/index.html','/demo':'/index.html','/admin':'/admin.html','/admin/':'/admin.html'})[path]||path;
   const asset=Object.hasOwn(assets,route)?assets[route]:null;

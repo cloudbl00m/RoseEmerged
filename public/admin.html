@@ -21,15 +21,23 @@
 <form id="edit">
 <div class="pair"><label>Title<input name="title" maxlength="160" required></label><label>Project type<input name="type" maxlength="100" required></label></div>
 <label>Short description<textarea name="description" maxlength="2000" rows="3"></textarea></label>
+<label>Project skill tags <small>Separate tags with commas. Up to 24 tags, 120 characters each.</small><input name="skills" id="project-skills" placeholder="React, UI design, Python" maxlength="3000"></label><div class="tag-preview" id="project-tags"></div>
 <label>Public project URL <small>Optional</small><input type="url" name="url" placeholder="https://" pattern="https?://.+" autocapitalize="none"></label>
-<label>Thumbnail URL <small>Optional</small><input name="thumbnail" placeholder="https://…" autocapitalize="none"></label>
+<div class="thumbnail-editor"><label>Upload thumbnail <small>PNG, JPEG, or WebP. Up to 10 MB; optimized before upload.</small><input id="thumbnail-file" type="file" accept="image/png,image/jpeg,image/webp"></label><img id="thumbnail-preview" alt="Project thumbnail preview" hidden><button type="button" id="remove-thumbnail" hidden>Remove thumbnail</button><label>Or use a thumbnail URL <small>Optional</small><input name="thumbnail" placeholder="https://…" autocapitalize="none"></label><p id="upload-feedback" role="status"></p></div>
 <div class="preview"><div id="rose"></div><div class="growth">
 <label for="range">Rose completion</label><div class="number"><input id="percent" type="number" min="0" max="100" step="1" required aria-label="Completion percentage"><span>%</span></div>
 <input id="range" type="range" min="0" max="100" step="1" aria-label="Adjust rose completion"><small>Live garden preview</small>
 </div></div>
 <label class="publish"><input type="checkbox" name="published"><span>Publish in the garden<small>Unpublished projects stay private.</small></span></label>
 <div class="actions"><button class="primary">Save project</button><button type="button" id="delete" hidden>Delete project</button></div>
-</form></section></div></section>
+</form></section></div>
+<section class="panel team-editor"><div class="eyebrow">Behind the garden</div><h2>Team profiles &amp; skills</h2>
+<p class="hint">These bios and custom tags appear below the planters. Separate tags with commas.</p>
+<form id="team-form"><div class="team-columns">
+<div><h3>Akai</h3><label>Short bio<textarea name="akaiBio" maxlength="1000" rows="3"></textarea></label></div>
+<div><h3>Hoor</h3><label>Short bio<textarea name="hoorBio" maxlength="1000" rows="3"></textarea></label></div>
+</div><label>Team skill tags <small>One shared collection for the whole team. Up to 48 tags, 120 characters each, separated by commas.</small><input name="teamSkills" placeholder="React, Python, UI design" maxlength="6000"></label><div class="tag-preview" id="team-tags"></div><button class="primary">Save team profiles</button><p id="team-feedback" role="status"></p></form>
+</section></section>
 <p id="feedback" role="status" aria-live="polite">Opening studio…</p>
 </main>
 <dialog id="confirmation"><form method="dialog"><h2>Delete project?</h2><p id="delete-info"></p><div class="actions"><button value="cancel" autofocus>Cancel</button><button class="danger" value="delete">Delete project</button></div></form></dialog>

@@ -15,3 +15,98 @@ footer{min-height:50px;border-top:1px solid #c7b48b48;background:#141b16d9;font-
 #rain-sound{border:1px solid #a8997366;border-radius:20px;padding:7px 12px;font-size:12px;white-space:nowrap}
 @media(max-width:700px){nav{gap:10px}#rain-sound{font-size:10px;padding:6px 8px}}
 @media(max-width:700px){header{flex-wrap:wrap;gap:8px;padding-block:12px}nav{margin-left:auto;flex-wrap:wrap}}
+
+/* Keep the automatic tour inside the rooftop viewport. */
+body{overflow-x:clip}.plot-controls #plot-count{border-left:0}.plot-controls #tour-toggle{min-width:110px;padding-inline:18px}#beds{will-change:transform,opacity}@media(prefers-reduced-motion:reduce){#beds{will-change:auto}}
+
+#beds{touch-action:pan-y}.draggable{cursor:grab}.dragging{cursor:grabbing;user-select:none}#drag-hint{font-size:12px;padding:0 14px;color:var(--muted);white-space:normal}.dragging img{-webkit-user-drag:none}
+
+/* One continuous strip; dragging changes its native scroll position directly. */
+#beds{display:flex;flex-direction:row;align-items:flex-end;justify-content:flex-start;overflow-x:auto;overflow-y:hidden;touch-action:pan-x pan-y;scrollbar-width:thin;scrollbar-color:#a08e63 #192119;gap:1.3vw;padding-top:25px;padding-bottom:28px;width:100%;min-width:0;will-change:auto}
+#beds .bed{flex:0 0 calc((100% - 2.6vw)/3);width:auto}
+#beds.dragging{user-select:none;scroll-behavior:auto}
+@media(max-width:700px){#beds{flex-direction:row;gap:16px;align-items:flex-end}#beds .bed{flex:0 0 88%;width:88%}.rose{height:220px}}
+html{scroll-behavior:smooth}
+main{flex:none;min-height:calc(100svh - 84px);padding-bottom:38px}
+.scene:after{background:linear-gradient(180deg,#132b3480,transparent 48%,#182a2844),linear-gradient(90deg,#10252666,transparent 75%)}
+header{background:#18313233}
+.scroll-invitation{grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:20px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin:4px auto 14px;color:#f0eadb;text-shadow:0 1px 5px #152b2a}
+.scroll-invitation span:last-child{font-size:25px}
+.field-notes{position:relative;z-index:4;background:#f3f1e7;color:#263f3b;margin-top:25px;padding:45px 6vw 70px}
+.mist-edge{position:absolute;left:0;bottom:calc(100% - 1px);width:100%;height:90px;pointer-events:none}
+.notes-inner{max-width:1200px;margin:0 auto}
+.section-line{display:flex;justify-content:space-between;gap:20px;border-top:1px solid #34534733;padding-top:22px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5c7168}
+.notes-heading{display:grid;grid-template-columns:1.4fr 1fr;gap:16px 60px;padding:70px 0 55px;align-items:end}
+.overline{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#71826a;font-weight:600}
+.notes-heading>.overline{grid-column:1/-1;margin:0}
+.field-notes h2{font-size:clamp(42px,5.1vw,76px);line-height:1.07;letter-spacing:-.055em;margin:0}
+.field-notes h2 span{color:#ad7969}
+.notes-heading>p:last-child,.team-heading>p:last-child{font-size:16px;line-height:1.8;color:#63756b;max-width:355px;margin:0}
+.project-story{display:grid;grid-template-columns:65px 1fr 150px;gap:24px;padding:38px 0;border-top:1px solid #34534726}
+.story-number{font:italic 24px Georgia,serif;color:#8a9a86;padding-top:3px}
+.story-content>.overline{margin:0 0 10px}.story-content h3{font-size:clamp(30px,3vw,43px);letter-spacing:-.035em;margin:0 0 15px}
+.story-description{max-width:620px;line-height:1.8;font-size:15px;color:#64756b;margin:0 0 20px;white-space:pre-line}
+.skill-tags{list-style:none;padding:0;margin:16px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.skill-tags li{border:1px solid #637d5b33;background:#e3e9db;padding:7px 14px;border-radius:20px;color:#4e6651;font-size:12px}
+.story-status{display:flex;flex-direction:column;gap:8px;align-items:flex-end;color:#7a8875;font-size:11px;letter-spacing:.04em}
+.story-percent{font:42px Georgia,serif;color:#506c52}.story-link{font-size:12px;margin-top:20px;color:#536b56}
+a.story-link{border-bottom:1px solid #91a088;padding-bottom:5px}
+#team{padding-top:85px;scroll-margin-top:30px}
+.team-heading{padding:60px 0 40px}.team-heading>p:last-child{margin-top:22px;max-width:500px}
+.team-profiles{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin:20px 0 70px}
+.person{border-top:1px solid #34534733;padding-top:30px;position:relative;padding-right:55px}
+.person-initial{position:absolute;right:0;top:27px;font:italic 65px Georgia,serif;color:#bcc8b0}
+.person h3{font-size:42px;letter-spacing:-.03em;margin:12px 0 16px}
+.person-bio{font-size:15px;line-height:1.8;color:#64756b;white-space:pre-line;overflow-wrap:anywhere}
+.back-to-garden{display:flex;justify-content:space-between;border-top:1px solid #34534733;padding-top:25px;font-size:13px;color:#5b705d}
+.reveal.will-reveal{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.is-visible{opacity:1;transform:none}
+footer{position:relative;z-index:4;background:#233c34}
+@media(max-width:700px){main{padding-bottom:65px}.scroll-invitation{font-size:9px;margin-top:18px}.field-notes{padding:30px 24px 45px}.section-line{font-size:8px}.section-line span:last-child{display:none}.notes-heading{grid-template-columns:1fr;padding:45px 0;gap:24px}.project-story{grid-template-columns:30px 1fr;gap:15px}.story-status{grid-column:2;align-items:flex-start;flex-direction:row;align-items:center;flex-wrap:wrap;gap:12px}.story-percent{font-size:25px}.story-link{margin-top:0;margin-left:auto}.team-profiles{grid-template-columns:1fr;gap:36px}.mist-edge{height:60px}#team{padding-top:55px}.team-heading{padding:40px 0 25px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal.will-reveal{opacity:1;transform:none;transition:none}}
+.scene{background-image:url('/assets/rooftop-morning.png');background-position:center center}
+#beds{padding-top:70px}
+
+.shared-skills{border-top:1px solid #34534733;padding:35px 0 55px;margin-top:-25px}.shared-skills h3{font-size:38px;letter-spacing:-.035em;margin:14px 0 22px}.shared-skills .skill-tags li{font-size:14px;padding:10px 18px}
+
+.skill-meadow{list-style:none;margin:24px 0 0;padding:20px 0 35px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px 30px;position:relative}
+.skill-flower{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 14px 24px;border-bottom:1px solid #71836326}
+.skill-flower svg{width:150px;height:172px;overflow:visible;filter:drop-shadow(0 4px 5px #6275510a)}
+.flower-skill-name{font:18px/1.5 Georgia,serif;color:#3d5945;max-width:100%;overflow-wrap:anywhere;min-height:50px;display:flex;align-items:center;justify-content:center}
+.skill-bloom{transform-origin:80px 65px;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.skill-flower:hover .skill-bloom{transform:rotate(9deg) scale(1.07)}
+.skill-flower.will-reveal{transition-delay:var(--flower-delay,0ms)}
+.empty-meadow{grid-column:1/-1;color:#718363;font-size:14px}
+@media(max-width:1000px){.skill-meadow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.skill-meadow{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.skill-flower{padding:6px 4px 18px}.skill-flower svg{width:120px;height:150px}.flower-skill-name{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.skill-bloom{transition:none}.skill-flower:hover .skill-bloom{transform:none}}
+.contact-garden{display:grid;grid-template-columns:1fr 1fr;align-items:center;position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 80% 25%,#48614b55,transparent 65%),#223b32;color:#f3ecd9;border:1px solid #879d704d;border-radius:24px;padding:55px 40px 40px 55px;margin:30px 0 65px;box-shadow:0 22px 60px #263a2521}
+.contact-garden:after{content:"";position:absolute;inset:12px;border:1px solid #d4d5ae1a;border-radius:15px;pointer-events:none;z-index:-1}
+.contact-copy>.overline{color:#c5c5a3;font-size:9px;line-height:1.8}
+.contact-garden h2{font-size:clamp(40px,4.1vw,61px);margin:30px 0 20px}
+.contact-garden h2 span{color:#c99380}
+.contact-copy>p:not(.overline){font-size:14px;line-height:1.9;color:#bcc8b5}
+.contact-email{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #b5c19d66;color:#f4ebcf;font-size:clamp(13px,1.5vw,19px);padding:20px 0 15px;margin-top:15px;overflow-wrap:anywhere}
+.contact-email span{font-size:25px;color:#d3be89}
+.contact-signature{display:block;margin-top:35px;font:italic 17px Georgia,serif;color:#a8baa2}
+.rain-vessel{min-width:0}.rain-vessel svg{display:block;width:100%;height:auto;overflow:visible}
+.vessel-cloud{transform-origin:280px 100px}
+.vessel-rain line{opacity:0}
+.is-raining .vessel-rain line{animation:vessel-drop var(--speed) var(--delay) linear infinite}
+.vessel-water{transform:translateY(108px);transform-origin:280px 440px}
+.has-filled .vessel-water{animation:fill-vessel 8s cubic-bezier(.2,.4,.3,1) forwards}
+.is-raining .vessel-cloud{animation:cloud-drift 7s ease-in-out infinite alternate}
+@keyframes vessel-drop{0%{transform:translate(0,0);opacity:0}12%{opacity:.65}85%{opacity:.4}100%{transform:translate(-8px,108px);opacity:0}}
+@keyframes fill-vessel{from{transform:translateY(108px)}to{transform:translateY(0)}}
+@keyframes cloud-drift{from{transform:translate(-3px,0)}to{transform:translate(4px,-5px)}}
+.tab-hidden *{animation-play-state:paused!important}
+@media(max-width:700px){.contact-garden{grid-template-columns:1fr;padding:35px 26px 25px;margin-bottom:40px;border-radius:20px}.contact-garden h2{font-size:43px;margin-top:22px}.contact-email{font-size:16px}.rain-vessel{max-width:400px;width:100%;margin:-5px auto 0}.contact-signature{margin-top:22px}}
+@media(prefers-reduced-motion:reduce){.vessel-water,.has-filled .vessel-water{transform:none;animation:none}.vessel-cloud,.is-raining .vessel-cloud,.is-raining .vessel-rain line{animation:none}}
+/* The outlined lettering is the reservoir. */
+.vessel-water{transform:translateY(175px);animation:none!important}
+.is-raining .vessel-cloud{animation:cloud-rumble .18s ease-in-out infinite alternate}
+.contact-garden.is-starting{animation:contact-rumble .7s ease-out}
+@keyframes cloud-rumble{0%{transform:translate(-2px,0) rotate(-.6deg)}100%{transform:translate(2px,1px) rotate(.6deg)}}
+@keyframes contact-rumble{0%,100%{transform:translate(0)}15%,45%{transform:translate(-2px,1px)}30%,60%{transform:translate(2px,-1px)}75%{transform:translate(-1px,0)}}
+.is-full .vessel-cloud{transform:translateY(-3px);transition:transform 1.5s ease}
+@media(prefers-reduced-motion:reduce){.contact-garden.is-starting,.is-raining .vessel-cloud{animation:none}.vessel-water{transform:none}}

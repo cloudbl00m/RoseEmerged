@@ -13,13 +13,22 @@ const store={
   read(){ const row=db.prepare('SELECT version,rows FROM garden WHERE id=1').get();return {...row,rows:JSON.parse(row.rows)}; },
   write(rows,version){ return db.prepare('UPDATE garden SET rows=?,version=version+1 WHERE id=1 AND version=?').run(JSON.stringify(rows),version).changes===1; }
 };
+db.prepare('INSERT OR IGNORE INTO team VALUES(1,0,?)').run('[]');
+const teamStore={
+  read(){const row=db.prepare('SELECT version,rows FROM team WHERE id=1').get();return {...row,rows:JSON.parse(row.rows)};},
+  write(rows,version){return db.prepare('UPDATE team SET rows=?,version=version+1 WHERE id=1 AND version=?').run(JSON.stringify(rows),version).changes===1;}
+};
 const token=req=>createHash('sha256').update(req.headers.get('cookie')?.match(/(?:^|;\s*)rose=([a-f0-9]{64})(?:;|$)/)?.[1]||'').digest('hex');
 const cookie=(value,age)=>'rose='+value+'; Path=/; HttpOnly; SameSite=Strict; Max-Age='+age+(process.env.ROSE_HTTPS==='1'?'; Secure':'');
 const answer=(obj,status=200,headers={})=>Response.json(obj,{status,headers:{'Cache-Control':'no-store',...headers}});
 const derive=promisify(scrypt);
 const attempts=new Map();
 const auth={
-  mode:'password',store,
+  mode:'password',store,teamStore,
+  uploads:{
+    get(id){const row=db.prepare('SELECT type,bytes FROM uploads WHERE id=?').get(id);return row;},
+    put(id,bytes,type){db.prepare('INSERT INTO uploads VALUES(?,?,?)').run(id,type,bytes);}
+  },
   authorized(req){ return !!db.prepare('SELECT 1 FROM sessions JOIN accounts USING(name) WHERE token=? AND expires>?').get(token(req),Date.now()); },
   async login({account,password},req){
     const name=adminAccounts.get(String(account).trim().toLowerCase()),now=Date.now();
@@ -46,9 +55,9 @@ const server=http.createServer(async (input,out)=>{
   try {
     const url=new URL(input.url,'http://'+input.headers.host);
     let result;
-    if(url.pathname.startsWith('/api/')) {
+    if(url.pathname.startsWith('/api/') || url.pathname.startsWith('/media/')) {
       const chunks=[];let bytes=0;
-      for await(const c of input) { bytes+=c.length;if(bytes>100000){out.writeHead(413);out.end();return;} chunks.push(c); }
+      for await(const c of input) { bytes+=c.length;if(bytes>(url.pathname==='/api/admin/uploads'?5*1024*1024:100000)){out.writeHead(413,{'Content-Type':'application/json'});out.end(JSON.stringify({error:'The file or request is too large.'}));return;} chunks.push(c); }
       const headers=new Headers(input.headers);
       headers.set('x-local-peer',input.socket.remoteAddress||'local');
       if(process.env.ROSE_HTTPS==='1') url.protocol='https:';

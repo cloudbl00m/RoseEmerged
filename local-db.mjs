@@ -8,6 +8,8 @@ export function openDatabase(demo=false) {
   const db=new DatabaseSync(join(dir,demo?'development.sqlite':'garden.sqlite'));
   db.exec(`PRAGMA journal_mode=WAL;
     CREATE TABLE IF NOT EXISTS garden(id INTEGER PRIMARY KEY CHECK(id=1), version INTEGER NOT NULL, rows TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS team(id INTEGER PRIMARY KEY CHECK(id=1), version INTEGER NOT NULL, rows TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS uploads(id TEXT PRIMARY KEY, type TEXT NOT NULL, bytes BLOB NOT NULL);
     CREATE TABLE IF NOT EXISTS accounts(name TEXT PRIMARY KEY, salt TEXT NOT NULL, hash TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY, name TEXT NOT NULL, expires INTEGER NOT NULL);`);
   return db;

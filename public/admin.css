@@ -12,3 +12,7 @@ button,input,textarea{font:inherit}button{border:1px solid var(--brass);backgrou
 dialog{color:var(--ink);max-width:min(420px,90vw)}dialog::backdrop{background:#000a}
 @media(max-width:740px){.studio-grid{grid-template-columns:1fr}.pair{grid-template-columns:1fr}.preview{grid-template-columns:1fr 1.1fr}.wordmark{font-size:1.5rem}header,nav{gap:.45rem}nav{font-size:.87rem}}
 .login-link{display:inline-block;border-radius:.4rem;padding:.6rem .9rem;text-decoration:none}
+
+.team-editor{margin-top:28px}.team-columns{display:grid;grid-template-columns:1fr 1fr;gap:32px}.tag-preview{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.tag-preview button{font-size:12px;border:1px solid #9d8b65;border-radius:20px;padding:6px 12px;background:#2d392b;color:#f2e8d1}.team-editor h3{font-family:Georgia,serif;font-size:26px;font-weight:400}@media(max-width:700px){.team-columns{grid-template-columns:1fr}}
+
+.thumbnail-editor{border:1px solid #8f9c7040;border-radius:10px;padding:16px;margin-bottom:20px}#thumbnail-preview{display:block;width:140px;max-height:140px;object-fit:contain;border-radius:8px;margin:12px 0;background:#101810}#thumbnail-preview[hidden]{display:none}#upload-feedback{font-size:13px;color:#d4c49d}#thumbnail-file{padding:12px}

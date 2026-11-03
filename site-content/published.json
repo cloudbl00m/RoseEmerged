@@ -1,0 +1,65 @@
+{
+  "projects": [
+    {
+      "id": "ff2641cb-4c08-4b86-a967-896119f3842c",
+      "title": "bubbles",
+      "type": "Website social media",
+      "description": "A dream-like social media in development.",
+      "url": "https://akaishuichi21.github.io/bubblesPub/",
+      "thumbnail": "",
+      "completion": 100,
+      "skills": [],
+      "published": true
+    },
+    {
+      "id": "d40b262b-e44b-479b-add3-0d3f8942c35d",
+      "title": "YouKit",
+      "type": "Tool",
+      "description": "A tool that we created to automate and make it easy to create ranking videos.",
+      "url": "",
+      "thumbnail": "",
+      "completion": 82,
+      "skills": [],
+      "published": true
+    },
+    {
+      "id": "de32410c-e456-446b-a6b8-2e01b743575f",
+      "title": "Video editor",
+      "type": "tool",
+      "description": "tool to create a video and add different videos with no watermark.",
+      "url": "",
+      "thumbnail": "",
+      "completion": 100,
+      "skills": [],
+      "published": true
+    },
+    {
+      "id": "4a890c1d-e7e3-4a71-9096-5ed6925bbc43",
+      "title": "School system",
+      "type": "System",
+      "description": "A system we are developing for schools.",
+      "url": "",
+      "thumbnail": "",
+      "completion": 100,
+      "skills": [],
+      "published": true
+    }
+  ],
+  "team": {
+    "skills": [
+      "React",
+      "AI Engineering",
+      "cybersecurity ( OSCP certificate & CPTS certificate)",
+      "Figma",
+      "Angular",
+      "yolo",
+      "numpy",
+      "pandas",
+      "SCIKIT-LEARN",
+      "matplotlib",
+      "Seaborn",
+      "website design"
+    ]
+  },
+  "uploads": {}
+}

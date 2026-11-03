@@ -1,12 +1,14 @@
+import {contentUrl} from './content-url.js';
 import {createRose} from './rose.js';
 import {createSoilSurface} from './soil.js';
 import './rain-audio.js';
 
 const $ = selector => document.querySelector(selector);
-const beds = $('#beds'), previous = $('#previous'), next = $('#next');
+const beds = $('#beds');
+let drag = null;
 const memory = new Map();
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-const sampleGarden = location.pathname.replace(/\/$/,'') === '/demo';
+const sampleGarden = location.pathname.replace(/\/$/,'')  .endsWith('/demo');
 let projects = [], plot = 0, plants = [], elapsed = 0, frame = 0, last = null, loaded = false, requestId = 0;
 const digits = value => String(value).padStart(2,'0');
 const clamp = value => Math.max(0,Math.min(1,value));
@@ -31,7 +33,7 @@ function node(tag, className, value) {
 function safeWebUrl(value, local = false) {
   if (!value) return '';
   try {
-    const url = local ? new URL(value,location.origin) : new URL(value);
+    const url = local ? new URL(contentUrl(value),location.href) : new URL(value);
     return ['https:','http:'].includes(url.protocol) ? url.href : '';
   } catch { return ''; }
 }
@@ -70,7 +72,7 @@ function buildBed(project, index) {
   content.style.opacity = established ? '1':'0';
   content.inert = !established;
   rose.setGrowth(established ? project.completion:0);
-  return {bed, rose, project, content, established, reached:established};
+  return {bed, rose, project, content, established, reached:established, age:null, growthDuration:1300};
 }
 
 const canvas = $('#rain'), ctx = canvas.getContext('2d');
@@ -138,17 +140,29 @@ function drawRain(strength,delta) {
 function paint(delta) {
   const instant=motion.matches;
   if (instant) elapsed=Math.max(elapsed,2000);
+  const viewport=beds.getBoundingClientRect();
   for (const plant of plants) {
+    const bounds=plant.bed.getBoundingClientRect();
+    const visibleWidth=Math.max(0,Math.min(bounds.right,viewport.right)-Math.max(bounds.left,viewport.left));
+    const visibleFraction=visibleWidth/Math.min(bounds.width,viewport.width);
+    // A small peek stays bare. Once triggered, growth can continue at the edge.
+    if (!instant && (visibleWidth<=0 || (plant.age===null && visibleFraction<.65))) continue;
+    if (plant.age===null) {
+      plant.age=0;
+      plant.growthDuration=beds.scrollLeft>5 ? 4200:1300;
+      if(!plant.established) elapsed=0;
+    }
+    plant.age+=delta;
     if (plant.established) continue;
-    const progress = instant ? 1 : clamp((elapsed-250)/1300);
+    const progress = instant ? 1 : clamp((plant.age-250)/plant.growthDuration);
     plant.rose.setGrowth(plant.project.completion*ease(progress));
     if (progress === 1 && !plant.reached) {
       plant.reached = true; remember(plant.project); plant.content.inert = false;
     }
-    plant.content.style.opacity = String(instant ? 1:ease(clamp((elapsed-1550)/450)));
+    plant.content.style.opacity = String(instant ? 1:ease(clamp((plant.age-250-plant.growthDuration)/650)));
   }
   for (const plant of plants) {
-    const wetness=instant ? 1:ease(clamp(elapsed/3200));
+    const wetness=instant ? 1:ease(clamp((plant.age||0)/3200));
     plant.bed.style.setProperty('--soil-wetness',String(wetness));
   }
   const storm = instant ? 0:1-ease(clamp((elapsed-3000)/2000));
@@ -173,18 +187,20 @@ function start() {
 
 function render() {
   stop();
+  cancelDrag();
   const total=Math.ceil(projects.length/3);
   plot=Math.max(0,Math.min(plot,total-1)); elapsed=0;
-  previous.disabled=plot===0; next.disabled=plot+1>=total;
+  beds.classList.toggle('draggable',projects.length>1);
+  $('#drag-hint').textContent=projects.length>1 ? 'Drag to explore ↔ · Arrow keys also work' : 'The rooftop collection';
   $('#plot-count').textContent='Plot '+digits(total ? plot+1:0)+' / '+digits(total);
-  plants=projects.slice(plot*3,plot*3+3).map((project,i) => buildBed(project,plot*3+i));
+  plants=projects.map((project,i) => buildBed(project,i));
   beds.replaceChildren(...plants.map(plant=>plant.bed));
   locateSoil();
   beds.setAttribute('aria-busy','false');
   $('#notice').replaceChildren();
   if (!total) {
     $('#notice').append(document.createTextNode('The garden is waiting for its first published project. '));
-    if (!sampleGarden) { const link=node('a','project-link','Explore the sample garden ↗');link.href='/demo';$('#notice').append(link); }
+    if (!sampleGarden) { const link=node('a','project-link','Explore the sample garden ↗');link.href=contentUrl('/demo');$('#notice').append(link); }
   }
   if (plants.some(plant => plant.project.sample)) $('.eyebrow').innerHTML='<i></i>The rooftop collection · Sample garden';
   else $('.eyebrow').innerHTML='<i></i>The rooftop collection';
@@ -193,12 +209,12 @@ function render() {
 async function refresh() {
   const id=++requestId;
   try {
-    const response=await fetch(sampleGarden ? '/api/demo-projects':'/api/projects',{cache:'no-store'});
+    const response=await fetch(contentUrl(sampleGarden ? '/api/demo-projects':'/api/projects'),{cache:'no-store'});
     if(!response.ok) throw Error('Unavailable');
     const data=await response.json();
     if(id!==requestId) return;
     if(!Array.isArray(data)) throw Error('Unexpected portfolio data');
-    if(!loaded || JSON.stringify(projects)!==JSON.stringify(data)) { projects=data; loaded=true; render(); }
+    if(!loaded || JSON.stringify(projects)!==JSON.stringify(data)) { projects=data; loaded=true; render(); document.dispatchEvent(new CustomEvent("garden-projects",{detail:projects})); }
   } catch {
     if (id!==requestId || loaded) return;
     $('#notice').textContent='The garden couldn’t load. ';
@@ -206,8 +222,40 @@ async function refresh() {
     beds.setAttribute('aria-busy','false');
   }
 }
-previous.onclick=()=>{if(plot>0){plot--;render();void refresh();}};
-next.onclick=()=>{if((plot+1)*3<projects.length){plot++;render();void refresh();}};
+function cancelDrag() {
+  const previous=drag;
+  drag=null;
+  if(previous && beds.hasPointerCapture(previous.id)) beds.releasePointerCapture(previous.id);
+  beds.classList.remove('dragging');
+}
+beds.addEventListener('pointerdown',event=>{
+  if(event.pointerType==='touch' || !event.isPrimary || event.button!==0 || event.target.closest('a,button')) return;
+  drag={id:event.pointerId,x:event.clientX,left:beds.scrollLeft};
+});
+beds.addEventListener('pointermove',event=>{
+  if(!drag || drag.id!==event.pointerId) return;
+  const dx=event.clientX-drag.x;
+  if(Math.abs(dx)>4) {
+    beds.setPointerCapture(event.pointerId);
+    beds.classList.add('dragging');
+    beds.scrollLeft=drag.left-dx;
+  }
+});
+beds.addEventListener('pointerup',cancelDrag);
+beds.addEventListener('pointercancel',cancelDrag);
+beds.addEventListener('lostpointercapture',cancelDrag);
+beds.addEventListener('dragstart',event=>event.preventDefault());
+beds.addEventListener('scroll',()=>{
+  locateSoil();
+  const first=plants.findIndex(plant=>plant.bed.getBoundingClientRect().right>beds.getBoundingClientRect().left+50);
+  plot=Math.floor(Math.max(0,first)/3);
+  $('#plot-count').textContent='Plot '+digits(projects.length?plot+1:0)+' / '+digits(Math.ceil(projects.length/3));
+},{passive:true});
+beds.addEventListener('keydown',event=>{
+  if(event.target!==beds || !['ArrowLeft','ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  beds.scrollBy({left:(event.key==='ArrowRight'?1:-1)*(plants[0]?.bed.clientWidth||300),behavior:motion.matches?'instant':'smooth'});
+});
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden) stop();else {start();void refresh();}
 });
@@ -219,4 +267,4 @@ window.addEventListener('scroll',locateSoil,{passive:true});
 document.querySelectorAll('[data-about]').forEach(button=>button.onclick=()=>$('#about').showModal());
 $('#close').onclick=()=>$('#about').close();
 $('#about').onclick=event=>{if(event.target===$('#about')) {const r=$('#about').getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom) $('#about').close();}};
-previous.disabled=true; next.disabled=true; resizeRain(); start(); void refresh();
+resizeRain(); start(); void refresh();

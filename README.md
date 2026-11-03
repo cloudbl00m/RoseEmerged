@@ -48,3 +48,18 @@ The service tests start a real HTTP server with disposable credentials and a tem
 The Node server supports email and password sign-in independently of ChatGPT. The only permitted emails are mohammad.akai21@gmail.com and hoorhkk@gmail.com, defined server-side in admins.mjs. Run the account setup commands above on your destination host to set your own app passwords. Existing Akai and Hoor password records continue to work with their corresponding email logins. Email/password sign-in does not use your Gmail password.
 
 Deploy this source directory to a Node host with a persistent disk. Set HOST=0.0.0.0, PORT as required by the host, ROSE_DATA_DIR to the persistent disk path and ROSE_HTTPS=1 behind HTTPS. Run npm start. Open https://your-domain/admin and enter your configured email and app password. Hosted Sites preview continues to use its platform sign-in.
+
+## Project and team skill tags
+
+Open /admin. Each project has a Project skill tags field. Enter custom tags separated by commas, then save the project. Published project tags appear in the project details below the planters.
+
+The Team profiles & skills section at the bottom of the dashboard lets you edit Akai and Hoor's public bios and their separate skill tags. Select Save team profiles to publish those changes. Each profile supports up to 24 tags of 40 characters each. Team profiles are stored with the shared database, independently of project publication.
+
+The garden supports horizontal dragging through the planters and vertical scrolling to project stories and the team. The new background is public/assets/rooftop-morning.png. The lower section is rendered by public/field-notes.js.
+
+## Upload project thumbnails
+
+In /admin, choose a project and select Upload thumbnail. PNG, JPEG, and WebP files up to 10 MB are accepted. The browser resizes large images to at most 1600 pixels on the longest edge and optimizes them before upload. Save the project to apply the thumbnail. Remove thumbnail clears it from the project when saved.
+
+Local image bytes live in the uploads table of the same SQLite database, so the existing database backup includes them. Hosted images use the private R2 bucket. Uploaded images are publicly readable only while a published project uses them. Draft and unused uploads require an authorized admin session.
+See GITHUB-PAGES.md for GitHub Pages deployment.

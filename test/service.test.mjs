@@ -33,7 +33,32 @@ test('public garden and both authorized editors share a persistent project lifec
     assert.equal(response.status,200);cookies.push(response.headers.get('set-cookie').split(';')[0]);
   }
   const [akai,hoor]=cookies;
-  const draft={title:'Private test',type:'Tool',description:'Secret description',completion:0,published:false};
+  const picture=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aG8sAAAAASUVORK5CYII=','base64');
+  const upload=cookie=>fetch(origin+'/api/admin/uploads',{method:'POST',headers:{'content-type':'image/png',cookie:cookie||''},body:picture});
+  assert.equal((await upload()).status,401);
+  const uploaded=await upload(akai);assert.equal(uploaded.status,201);
+  const imageUrl=(await uploaded.json()).url;
+  assert.equal((await api(imageUrl)).status,404);
+  assert.equal((await api(imageUrl,'GET',undefined,hoor)).status,200);
+  const invalid=await fetch(origin+'/api/admin/uploads',{method:'POST',headers:{'content-type':'image/png',cookie:akai},body:'not an image'});
+  assert.equal(invalid.status,400);
+
+  assert.equal((await api('/api/admin/team')).status,401);
+  assert.equal((await api('/api/admin/team','PUT',{members:[]},akai)).status,400);
+  const members=[
+    {id:'akai',bio:'Builds thoughtful tools.',skills:['React','UI design','React']},
+    {id:'hoor',bio:'Makes ideas tangible.',skills:['Python','Research']}
+  ];
+  assert.equal((await api('/api/admin/team','PUT',{members,skills:['React','UI design','React','Python','Research']},akai)).status,200);
+  const publicTeam=await (await api('/api/team')).json();
+  assert.deepEqual(publicTeam.skills,['React','UI design','Python','Research']);
+  assert.equal((await (await api('/api/admin/team','GET',undefined,hoor)).json()).members[1].bio,members[1].bio);
+  const longTag='cybersecurity ( OSCP certificate & CPTS certificate)';
+  assert.equal((await api('/api/admin/team','PUT',{members,skills:[longTag]},akai)).status,200);
+  assert.deepEqual((await (await api('/api/team')).json()).skills,[longTag]);
+  assert.equal((await api('/api/admin/team','PUT',{members,skills:['x'.repeat(121)]},akai)).status,400);
+
+  const draft={title:'Private test',thumbnail:imageUrl,type:'Tool',description:'Secret description',completion:0,published:false,skills:['JavaScript','Accessibility']};
   const created=await api('/api/admin/projects','POST',draft,akai);
   assert.equal(created.status,201);const {id}=await created.json();
   const list=async()=>await (await api('/api/projects')).json();
@@ -44,12 +69,12 @@ test('public garden and both authorized editors share a persistent project lifec
   const edit=async data=>api('/api/admin/projects/'+id,'PUT',{...draft,...data},hoor);
   assert.equal((await edit({url:'javascript:alert(1)'})).status,400);
   assert.equal((await edit({completion:101})).status,400);
-  assert.equal((await edit({published:true})).status,200);assert.equal((await list()).length,4);
+  assert.equal((await edit({published:true})).status,200);assert.equal((await list()).length,4);assert.equal((await api(imageUrl)).status,200);assert.deepEqual((await list()).at(-1).skills,draft.skills);
   await edit({completion:60,published:true});assert.equal((await list()).at(-1).completion,60);
   const ids=(await list()).map(p=>p.id).reverse();
   assert.equal((await api('/api/admin/order','POST',{ids},akai)).status,200);assert.equal((await list())[0].id,id);
   assert.equal((await api('/api/admin/order','POST',{ids:[id]},akai)).status,409);
-  await edit({published:false});assert.equal((await list()).length,3);
+  await edit({published:false});assert.equal((await list()).length,3);assert.equal((await api(imageUrl)).status,404);
   assert.equal((await api('/api/admin/projects/'+id,'DELETE',undefined,akai)).status,200);
   assert.equal((await api('/api/logout','POST',undefined,akai)).status,200);
   assert.equal((await api('/api/admin/projects','GET',undefined,akai)).status,401);
@@ -61,3 +86,4 @@ test('hosted admin requires a trusted identity with an allowlisted email',async(
     assert.equal((await hostedApi(request,env)).status,status);
   }
 });
+

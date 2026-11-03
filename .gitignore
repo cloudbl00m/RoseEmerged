@@ -4,3 +4,6 @@ node_modules/
 .env*
 *.sqlite*
 
+pages-dist/
+work/
+*.log

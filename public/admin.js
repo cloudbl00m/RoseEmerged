@@ -65,6 +65,10 @@ function choose(project) {
   for (const key of ['title', 'type', 'description', 'thumbnail', 'url']) {
     fields[key].value = project?.[key] ?? '';
   }
+  fields.skills.value=(project?.skills||[]).join(', ');
+  fields.skills.dispatchEvent(new Event('input'));
+  byId('upload-feedback').textContent='';
+  thumbnailPreview();
   fields.published.checked = Boolean(project?.published);
   const completion = project?.completion ?? 0;
   byId('percent').value = byId('range').value = completion;
@@ -130,6 +134,7 @@ async function reload() {
 }
 async function openStudio() {
   await reload();
+  await loadTeam();
   choose(projects[0]);
   drawList();
   byId('signin').hidden = true;
@@ -181,6 +186,7 @@ edit.addEventListener('submit', event => {
     const editing = selected !== null;
     const data = Object.fromEntries(['title', 'type', 'description', 'thumbnail', 'url']
       .map(key => [key, fields[key].value.trim()]));
+    data.skills=parseTags(fields.skills.value);
     data.completion = byId('percent').valueAsNumber;
     data.published = fields.published.checked;
     const path = '/api/admin/projects' + (editing ? '/' + encodeURIComponent(selected) : '');
@@ -233,3 +239,100 @@ perform(async () => {
   }
 });
 
+
+function parseTags(value) {
+  return [...new Set(value.split(',').map(tag=>tag.trim()).filter(Boolean))];
+}
+function tagPreview(input,container) {
+  function draw() {
+    const values=parseTags(input.value);
+    const tooLong=values.find(tag=>tag.length>120);
+    const limit=input.name==='teamSkills'?48:24;
+    input.setCustomValidity(tooLong ? 'Tag “'+tooLong.slice(0,45)+'…” exceeds 120 characters.' : values.length>limit ? 'Use up to '+limit+' tags.' : '');
+    container.replaceChildren();
+    for(const tag of parseTags(input.value)) {
+      const chip=document.createElement('button');
+      chip.type='button';
+      chip.textContent=tag+' ×';
+      chip.setAttribute('aria-label','Remove '+tag);
+      chip.addEventListener('click',()=>{
+        input.value=parseTags(input.value).filter(item=>item!==tag).join(', ');
+        input.dispatchEvent(new Event('input',{bubbles:true}));
+      });
+      container.append(chip);
+    }
+  }
+  input.addEventListener('input',draw);
+  draw();
+}
+const teamForm=byId('team-form');
+tagPreview(fields.skills,byId('project-tags'));
+tagPreview(teamForm.elements.teamSkills,byId('team-tags'));
+async function loadTeam() {
+  const data=await request('/api/admin/team');
+  const members=Array.isArray(data)?data:data.members;
+  for(const member of members) teamForm.elements[member.id+'Bio'].value=member.bio;
+  const skills=Array.isArray(data)?[...new Set(data.flatMap(member=>member.skills||[]))]:data.skills;
+  teamForm.elements.teamSkills.value=(skills||[]).join(', ');
+  teamForm.elements.teamSkills.dispatchEvent(new Event('input'));
+}
+teamForm.addEventListener('submit',event=>{
+  event.preventDefault();
+  perform(async()=>{
+    const members=['akai','hoor'].map(id=>({
+      id,bio:teamForm.elements[id+'Bio'].value.trim()
+    }));
+    await request('/api/admin/team','PUT',{members,skills:parseTags(teamForm.elements.teamSkills.value)});
+    byId('team-feedback').textContent='Team profiles and skill tags saved.';
+    report('Team profiles saved and visible below the garden.');
+  });
+});
+
+function thumbnailPreview() {
+  const image=byId('thumbnail-preview');
+  const value=fields.thumbnail.value.trim();
+  image.hidden=!value;
+  byId('remove-thumbnail').hidden=!value;
+  if(value) image.src=value;
+  else image.removeAttribute('src');
+}
+fields.thumbnail.addEventListener('input',thumbnailPreview);
+byId('remove-thumbnail').addEventListener('click',()=>{
+  fields.thumbnail.value='';
+  byId('thumbnail-file').value='';
+  dirty=true;
+  thumbnailPreview();
+  byId('upload-feedback').textContent='Thumbnail removed. Save the project to apply.';
+});
+byId('thumbnail-file').addEventListener('change',()=>{
+  const file=byId('thumbnail-file').files[0];
+  if(!file) return;
+  perform(async()=>{
+    const status=byId('upload-feedback');
+    status.textContent='Preparing image…';
+    try {
+      if(!['image/png','image/jpeg','image/webp'].includes(file.type)) throw Error('Choose a PNG, JPEG, or WebP image.');
+      if(file.size>10*1024*1024) throw Error('Choose an image up to 10 MB.');
+      const bitmap=await createImageBitmap(file);
+      const scale=Math.min(1,1600/Math.max(bitmap.width,bitmap.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(bitmap.width*scale));
+      canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+      canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);
+      bitmap.close();
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.85));
+      if(!blob) throw Error('This image could not be prepared.');
+      status.textContent='Uploading image…';
+      const response=await fetch('/api/admin/uploads',{method:'POST',headers:{'Content-Type':blob.type},body:blob,credentials:'same-origin'});
+      const result=await response.json();
+      if(!response.ok) throw Error(result.error||'Upload failed. Try again.');
+      fields.thumbnail.value=result.url;
+      dirty=true;
+      thumbnailPreview();
+      status.textContent='Image uploaded. Save the project to apply this thumbnail.';
+    } catch(error) {
+      status.textContent=error.message;
+      throw error;
+    } finally { byId('thumbnail-file').value=''; }
+  });
+});

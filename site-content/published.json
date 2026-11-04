@@ -17,6 +17,17 @@
       "published": true
     },
     {
+      "id": "d40b262b-e44b-479b-add3-0d3f8942c35d",
+      "title": "YouKit",
+      "type": "Tool",
+      "description": "A tool that we created to automate and make it easy to create ranking videos.",
+      "url": "",
+      "thumbnail": "",
+      "completion": 100,
+      "skills": [],
+      "published": true
+    },
+    {
       "id": "de32410c-e456-446b-a6b8-2e01b743575f",
       "title": "Video editor",
       "type": "tool",
@@ -35,6 +46,17 @@
       "url": "",
       "thumbnail": "",
       "completion": 80,
+      "skills": [],
+      "published": true
+    },
+    {
+      "id": "73b3651c-cf9e-4a77-9b38-7e20b9e5c813",
+      "title": "Gym system",
+      "type": "a complete system",
+      "description": "a system to help people doing gym",
+      "url": "",
+      "thumbnail": "",
+      "completion": 1,
       "skills": [],
       "published": true
     }
